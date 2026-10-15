@@ -1,57 +1,125 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Spring Boot HTML Page</title>
+    <title>Arij Belaid - Jenkins CI/CD Pipeline</title>
     <style>
       body {
         font-family: Arial, sans-serif;
-        background-color: #f2f2f2;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         margin: 0;
         padding: 0;
-      }
-
-      h1 {
-        text-align: center;
-        color: #333;
-        margin-top: 100px;
-      }
-
-      p {
-        text-align: center;
-        color: #666;
+        min-height: 100vh;
       }
 
       .container {
         text-align: center;
+        padding: 60px 20px;
+        color: #fff;
+      }
+
+      h1 {
+        text-align: center;
+        color: #fff;
+        margin-top: 50px;
+        font-size: 2.5em;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      h2 {
+        text-align: center;
+        color: #f0f0f0;
+        font-size: 1.5em;
         margin-top: 20px;
       }
 
-      .btn {
-        background-color: #007bff;
+      p {
+        text-align: center;
+        color: #f0f0f0;
+        font-size: 1.1em;
+        line-height: 1.6;
+        max-width: 800px;
+        margin: 15px auto;
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 30px;
+        max-width: 800px;
+        margin: 30px auto;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      }
+
+      .tech-badge {
+        display: inline-block;
+        background-color: rgba(255, 255, 255, 0.2);
         color: #fff;
-        padding: 10px 20px;
+        padding: 8px 15px;
+        margin: 5px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .btn {
+        background-color: #fff;
+        color: #764ba2;
+        padding: 12px 30px;
         text-decoration: none;
-        border-radius: 5px;
+        border-radius: 25px;
+        font-weight: bold;
+        display: inline-block;
+        margin-top: 20px;
+        transition: all 0.3s;
       }
 
       .btn:hover {
-        background-color: #0056b3;
+        background-color: #f0f0f0;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .footer {
+        text-align: center;
+        color: #e0e0e0;
+        margin-top: 40px;
+        font-size: 0.9em;
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1>Welcome to Jenkins Tutorial for Master DevOps and Cloud!</h1>
-      <p>
-        Welcome to Jenkins CI/CD Pipeline for Spring Boot Microservice
-        application deployed to Kubernetes using Helm
-      </p>
-      <p>
-        Docker - Minikube - Kubectl - Maven - SonarQube - Trivy - ArgoCD - Slack
-        - Webhook - ngRok - Jenkins - Helm
-      </p>
+      <h1>🚀 Arij Belaid - Jenkins CI/CD Pipeline</h1>
+      <h2>Master DevOps & Cloud - 2026</h2>
+
+      <div class="card">
+        <p>
+          Bienvenue sur mon application <strong>Spring Boot</strong> déployée
+          automatiquement via un pipeline <strong>Jenkins CI/CD</strong>.
+        </p>
+        <p>
+          Ce projet illustre la mise en place d'un workflow complet allant du
+          <strong>build Maven</strong> jusqu'au <strong>déploiement Kubernetes</strong>,
+          en passant par la <strong>conteneurisation Docker</strong>.
+        </p>
+      </div>
+
       <div>
-        <a class="btn" href="#">Learn More</a>
+        <span class="tech-badge">Docker</span>
+        <span class="tech-badge">Jenkins</span>
+        <span class="tech-badge">Kubernetes</span>
+        <span class="tech-badge">Maven</span>
+        <span class="tech-badge">Spring Boot</span>
+        <span class="tech-badge">Git</span>
+      </div>
+
+      <div>
+        <a class="btn" href="#">En savoir plus</a>
+      </div>
+
+      <div class="footer">
+        <p>Lab 2 — Jenkins CI/CD Pipeline | Arij Belaid</p>
       </div>
     </div>
   </body>
