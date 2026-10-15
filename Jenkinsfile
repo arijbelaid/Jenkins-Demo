@@ -1,99 +1,85 @@
 pipeline {
     agent any
 
-    environment {
-        // The MY_KUBECONFIG environment variable will be assigned
-        // the value of a temporary file.  For example:
-        //   /home/user/.jenkins/workspace/cred_test@tmp/secretFiles/546a5cf3-9b56-4165-a0fd-19e2afe6b31f/kubeconfig.txt
-        // MY_KUBECONFIG = credentials('my-kubeconfig')
-        registry = "wahidh007/demo-jenkins"
-        registryCredential = 'docker-hub-credentials'
-        dockerImage = ''        
+    tools {
+        jdk 'jdk-21'
+        maven 'maven-3.9.12'
     }
 
-
-    // tools {
-    //     // Install the Maven version configured as "M3" and add it to the path.
-    //     maven "M3"
-    // }
-
-    // Poll every 5 minutes, if there is a new code Jenkins will run the job
-    triggers {
-        pollSCM('*/5 * * * *')
+    environment {
+        DOCKER_IMAGE = "arijbelaid/jenkins-demo:${env.BUILD_NUMBER}"
     }
 
     stages {
         stage('Clone Repo') {
             steps {
-                git branch: 'main', url: 'https://github.com/wahid007/Jenkins-Demo.git'
-                // git 'https://github.com/wahid007/Jenkins-Demo'
+                echo '🔄 Récupération du dépôt GitHub...'
+                checkout scm
+                sh 'git log -1 --oneline'
             }
-
         }
-        
-        stage('Build App') {
+
+        stage('Build Project') {
             steps {
-                sh "mvn clean package"
+                echo '📦 Build Maven...'
+                sh 'mvn clean package -DskipTests'
+                sh 'ls -la target/'
             }
         }
-        
-        stage('Build image') {
-          steps{
-              // sh "docker build -t $registry:$BUILD_NUMBER ."
-              script {
-                dockerImage = docker.build registry + ":$BUILD_NUMBER"   
-              }          
-          }
-        }       
 
-        // // Add docker hub credentials in Jenkins : Go to Credentials → Global → Add credentials 
-        // stage('Push image') {
-        //   steps{
-        //     script {
-        //       // docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
-        //       docker.withRegistry('', registryCredential ) {
-        //         dockerImage.push()
-        //       }
-        //     }
-        //   }
-        // }
-
-        stage('Deploy Docker container'){
-          steps {
-            // sh "docker stop ${IMAGE_NAME} || true && docker rm $registry:$BUILD_NUMBER || true"
-            sh "docker run --name demo-jenkins -d -p 2222:2222 $registry:$BUILD_NUMBER"
-            slackSend color: "good", message: registry + ":$BUILD_NUMBER" + " - image successfully created! :man_dancing:"
-          }
+        stage('Fix Dockerfile') {
+            steps {
+                echo '🔧 Correction du Dockerfile (openjdk → eclipse-temurin)...'
+                sh '''
+                    sed -i 's|openjdk:17-jdk-slim|eclipse-temurin:17-jre|g' Dockerfile
+                    sed -i 's|openjdk:17-jdk|eclipse-temurin:17-jre|g' Dockerfile
+                    echo "=== Contenu du Dockerfile corrigé ==="
+                    cat Dockerfile
+                '''
+            }
         }
 
-        // stage('Deploy K8S'){
-        //   steps {
-        //     sh "kubectl apply -f k8s.yml"
-        //   }
-        // }
+        stage('Build Docker Image') {
+            steps {
+                echo "🐳 Construction de l'image Docker ${DOCKER_IMAGE}..."
+                sh "docker build -t ${DOCKER_IMAGE} ."
+                sh 'docker images | grep jenkins-demo'
+            }
+        }
 
-        // stage('Verify deployment'){
-        //   steps {
-        //     sh "kubectl get pods"
-        //     sh "kubectl get svc"
-        //   }
-        // }
+        stage('Deploy Docker Container') {
+            steps {
+                echo '🚀 Déploiement du conteneur Docker...'
+                sh '''
+                    docker stop devopsexample || true
+                    docker rm devopsexample || true
+                    docker run --name devopsexample -d -p 2222:2222 arijbelaid/jenkins-demo:${BUILD_NUMBER}
+                '''
+            }
+        }
 
-        // stage('Cleaning up') {
-        //   steps{
-        //     sh "docker rmi $registry:$BUILD_NUMBER"
-        //   }
-        // }        
+        stage('Verify') {
+            steps {
+                echo '✅ Vérification de l\'application...'
+                sh '''
+                    sleep 10
+                    docker ps | grep devopsexample
+                    curl -s http://localhost:2222 | head -20 || echo "Application en cours de démarrage"
+                '''
+            }
+        }
     }
-    
+
     post {
         success {
-            echo 'Pipeline execution successful!'
-            slackSend color: "good", message: "Pipeline execution successful! :man_dancing:"
+            echo '✅ Pipeline terminé avec succès !'
+            echo "Image Docker : arijbelaid/jenkins-demo:${env.BUILD_NUMBER}"
         }
         failure {
-            echo 'Pipeline execution failed.'
-            slackSend color: "danger", message: "Pipeline execution failed! :ghost:"
+            echo '❌ Le pipeline a échoué.'
         }
-    }    
+        always {
+            echo "Build #${env.BUILD_NUMBER} terminé"
+        }
+    }
 }
